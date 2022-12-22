@@ -7,6 +7,5 @@ package cn.batim;
  */
 public class BatimServer {
     public static void main(String[] args) {
-        System.out.println("Hello Github! 123");
     }
 }
