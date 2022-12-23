@@ -13,23 +13,17 @@ public class BatConfigUtil {
     private static BatConfig batConfig = null;
     private static final ConcurrentHashMap<String, BatConfig> HASH_MAP = new ConcurrentHashMap<>(16);
 
-    public static void main(String[] args) {
-        BatConfig batConfig = BatConfigUtil.useDefault();
-        Integer anInt = batConfig.getInt("redis.port");
-        System.out.println(anInt);
-    }
-
     private BatConfigUtil() {
     }
 
-    public static BatConfig useDefault() {
-        return use(BatConfig.CONFIG_FILE, "UTF-8");
+    public static BatConfig initDefault() {
+        return init(BatConfig.CONFIG_FILE, "UTF-8");
     }
-    public static BatConfig use(String fileName) {
-        return use(fileName, "UTF-8");
+    public static BatConfig init(String fileName) {
+        return init(fileName, "UTF-8");
     }
 
-    public static BatConfig use(String fileName, String encoding) {
+    public static BatConfig init(String fileName, String encoding) {
         BatConfig result = HASH_MAP.get(fileName);
         if (result == null) {
             result = new BatConfig(fileName, encoding);
@@ -42,11 +36,11 @@ public class BatConfigUtil {
         return result;
     }
 
-    public static BatConfig use(File file) {
-        return use(file, "UTF-8");
+    public static BatConfig init(File file) {
+        return init(file, "UTF-8");
     }
 
-    public static BatConfig use(File file, String encoding) {
+    public static BatConfig init(File file, String encoding) {
         BatConfig result = (BatConfig) HASH_MAP.get(file.getName());
         if (result == null) {
             result = new BatConfig(file, encoding);
@@ -60,7 +54,7 @@ public class BatConfigUtil {
     }
 
     public static BatConfig useless(String fileName) {
-        BatConfig previous = (BatConfig) HASH_MAP.remove(fileName);
+        BatConfig previous = HASH_MAP.remove(fileName);
         if (batConfig == previous) {
             batConfig = null;
         }
@@ -75,7 +69,7 @@ public class BatConfigUtil {
 
     public static BatConfig getBatConfig() {
         if (batConfig == null) {
-            throw new IllegalStateException("Load propties file by invoking BatConfigKit.use(String fileName) method first.");
+            throw new IllegalStateException("请先加载配置文件！");
         } else {
             return batConfig;
         }
