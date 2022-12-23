@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+    <output url="file://$MODULE_DIR$/../bat-gateway/target/classes" />
+    <output-test url="file://$MODULE_DIR$/../bat-gateway/target/test-classes" />
+    <content url="file://$MODULE_DIR$/../bat-gateway">
+      <sourceFolder url="file://$MODULE_DIR$/../bat-gateway/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../bat-gateway/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../bat-gateway/src/test/java" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/../bat-gateway/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
