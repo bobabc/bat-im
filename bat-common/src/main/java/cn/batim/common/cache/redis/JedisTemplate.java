@@ -1,8 +1,12 @@
 package cn.batim.common.cache.redis;
 
-import cn.batim.common.config.BatConfigUtil;
+import cn.batim.common.config.BatConfig;
+import cn.batim.common.config.biz.RedisConfig;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +16,8 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * @author wchao
+ * @author bob
  */
-@SuppressWarnings({"deprecation"})
 @Slf4j
 public class JedisTemplate implements Serializable {
 
@@ -23,7 +26,7 @@ public class JedisTemplate implements Serializable {
     private static volatile JedisTemplate instance = null;
     private static JedisPool jedisPool = null;
     private static volatile Jedis jedis = null;
-    private static RedisConfiguration redisConfig = null;
+    private static RedisConfig redisConfig = null;
 
     private JedisTemplate() {
     }
@@ -32,7 +35,8 @@ public class JedisTemplate implements Serializable {
         if (instance == null) {
             synchronized (JedisTemplate.class) {
                 try {
-                    redisConfig = new RedisConfiguration();
+                    BatConfig me = BatConfig.me();
+                    redisConfig = me.getRedisConfig();
                     init();
                     instance = new JedisTemplate();
                 } catch (Exception e) {
@@ -45,28 +49,29 @@ public class JedisTemplate implements Serializable {
     }
 
     private static final void init() throws Exception {
-        System.out.println(redisConfig);
-        if (redisConfig.getHost() == null) {
+        String host = redisConfig.host();
+        int port = redisConfig.port();
+        if (StringUtils.isEmpty(host)) {
             logger.error("the server ip of redis  must be not null!");
             throw new Exception("the server ip of redis  must be not null!");
         }
 
         JedisPoolConfig poolConfig = new JedisPoolConfig();
-
-        poolConfig.setMaxTotal(redisConfig.getMaxActive());
-        poolConfig.setMaxIdle(redisConfig.getMaxIdle());
-        poolConfig.setMaxWaitMillis(redisConfig.getMaxWait());
+        poolConfig.setMaxTotal(redisConfig.maxActive());
+        poolConfig.setMaxIdle(redisConfig.maxIdle());
+        poolConfig.setMaxWaitMillis(redisConfig.maxWait());
         poolConfig.setTestOnBorrow(true);
         poolConfig.setTestOnReturn(true);
+
         try {
-            if (StringUtils.isEmpty(redisConfig.getAuth())) {
-                jedisPool = new JedisPool(poolConfig, redisConfig.getHost(), redisConfig.getPort(), redisConfig.getTimeout());
+            if (StringUtils.isEmpty(redisConfig.auth())) {
+                jedisPool = new JedisPool(poolConfig, host, port, redisConfig.timeout());
             } else {
-                jedisPool = new JedisPool(poolConfig, redisConfig.getHost(), redisConfig.getPort(), redisConfig.getTimeout(), redisConfig.getAuth());
+                jedisPool = new JedisPool(poolConfig, host, port, redisConfig.timeout(), redisConfig.auth());
             }
         } catch (Exception e) {
-            logger.error("cann't create JedisPool for server" + redisConfig.getHost());
-            throw new Exception("cann't create JedisPool for server" + redisConfig.getHost());
+            logger.error("cann't create JedisPool for server" + host);
+            throw new Exception("cann't create JedisPool for server" + host);
         }
 
     }
@@ -105,8 +110,8 @@ public class JedisTemplate implements Serializable {
         do {
             jedis = jedisPool.getResource();
             count++;
-        } while (jedis == null && count < redisConfig.getRetryNum());
-        jedis.select(redisConfig.getDatabase());
+        } while (jedis == null && count < redisConfig.retryNum());
+        jedis.select(redisConfig.database());
         return jedis;
     }
 
@@ -850,7 +855,6 @@ public class JedisTemplate implements Serializable {
      */
     public Long listPushHead(final String key, final String value) {
         return new Executor<Long>(jedisPool) {
-
             @Override
             Long execute() {
                 return jedis.lpush(key, value);
@@ -908,7 +912,6 @@ public class JedisTemplate implements Serializable {
      */
     public void batchListPushTail(final String key, final String[] values, final boolean delOld) {
         new Executor<Object>(jedisPool) {
-
             @Override
             Object execute() {
                 if (delOld) {
@@ -997,6 +1000,22 @@ public class JedisTemplate implements Serializable {
             @Override
             List<String> execute() {
                 return jedis.lrange(key, 0, -1);
+            }
+        }.getResult();
+    }
+
+    public <T> List<T> listGetAll(final String key, final Class<T> clazz) {
+        return new Executor<List<T>>(jedisPool) {
+            @Override
+            List<T> execute() {
+                List<String> lrange = jedis.lrange(key, 0, -1);
+                List<T> list = Lists.newArrayList();
+                if (CollectionUtils.isNotEmpty(lrange)) {
+                    for (String s : lrange) {
+                        list.add(JSONObject.parseObject(s, clazz));
+                    }
+                }
+                return list;
             }
         }.getResult();
     }
@@ -1320,6 +1339,15 @@ public class JedisTemplate implements Serializable {
             @Override
             Object execute() {
                 String objectJson = JSON.toJSONString(value);
+                return set(key, objectJson);
+            }
+        }.getResult();
+    }
+
+    public Object set(final String key, final String objectJson) {
+        return new Executor<Object>(jedisPool) {
+            @Override
+            Object execute() {
                 return jedis.set(key, objectJson);
             }
         }.getResult();

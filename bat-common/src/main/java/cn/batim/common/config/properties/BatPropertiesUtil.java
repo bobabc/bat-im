@@ -1,4 +1,4 @@
-package cn.batim.common.config;
+package cn.batim.common.config.properties;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -9,24 +9,24 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author bob
  */
 @Slf4j
-public class BatConfigUtil {
-    private static BatConfig batConfig = null;
-    private static final ConcurrentHashMap<String, BatConfig> HASH_MAP = new ConcurrentHashMap<>(16);
+public class BatPropertiesUtil {
+    private static BatProperties batConfig = null;
+    private static final ConcurrentHashMap<String, BatProperties> HASH_MAP = new ConcurrentHashMap<>(16);
 
-    private BatConfigUtil() {
+    private BatPropertiesUtil() {
     }
 
-    public static BatConfig initDefault() {
-        return init(BatConfig.CONFIG_FILE, "UTF-8");
+    public static BatProperties initDefault() {
+        return init(BatProperties.CONFIG_FILE, "UTF-8");
     }
-    public static BatConfig init(String fileName) {
+    public static BatProperties init(String fileName) {
         return init(fileName, "UTF-8");
     }
 
-    public static BatConfig init(String fileName, String encoding) {
-        BatConfig result = HASH_MAP.get(fileName);
+    public static BatProperties init(String fileName, String encoding) {
+        BatProperties result = HASH_MAP.get(fileName);
         if (result == null) {
-            result = new BatConfig(fileName, encoding);
+            result = new BatProperties(fileName, encoding);
             HASH_MAP.put(fileName, result);
             if (batConfig == null) {
                 batConfig = result;
@@ -36,14 +36,14 @@ public class BatConfigUtil {
         return result;
     }
 
-    public static BatConfig init(File file) {
+    public static BatProperties init(File file) {
         return init(file, "UTF-8");
     }
 
-    public static BatConfig init(File file, String encoding) {
-        BatConfig result = (BatConfig) HASH_MAP.get(file.getName());
+    public static BatProperties init(File file, String encoding) {
+        BatProperties result = (BatProperties) HASH_MAP.get(file.getName());
         if (result == null) {
-            result = new BatConfig(file, encoding);
+            result = new BatProperties(file, encoding);
             HASH_MAP.put(file.getName(), result);
             if (batConfig == null) {
                 batConfig = result;
@@ -53,8 +53,8 @@ public class BatConfigUtil {
         return result;
     }
 
-    public static BatConfig useless(String fileName) {
-        BatConfig previous = HASH_MAP.remove(fileName);
+    public static BatProperties useless(String fileName) {
+        BatProperties previous = HASH_MAP.remove(fileName);
         if (batConfig == previous) {
             batConfig = null;
         }
@@ -67,7 +67,7 @@ public class BatConfigUtil {
         HASH_MAP.clear();
     }
 
-    public static BatConfig getBatConfig() {
+    public static BatProperties getBatConfig() {
         if (batConfig == null) {
             throw new IllegalStateException("请先加载配置文件！");
         } else {
@@ -75,8 +75,8 @@ public class BatConfigUtil {
         }
     }
 
-    public static BatConfig getBatConfig(String fileName) {
-        return (BatConfig) HASH_MAP.get(fileName);
+    public static BatProperties getBatConfig(String fileName) {
+        return (BatProperties) HASH_MAP.get(fileName);
     }
 
     public static String get(String key) {

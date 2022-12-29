@@ -2,12 +2,34 @@ package cn.batim.common.cache;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author bob
  * 2022年8月10日 上午11:38:26
  */
 public interface BatCache {
+
+    /**
+     *
+     * @param key
+     * @param value
+     */
+    void putList(String key, String value);
+
+    /**
+     * 删除
+     * @param key
+     * @param value
+     */
+    void removeList(String key, String value);
+
+    /**
+     *
+     * @param key
+     * @return
+     */
+    List<String> getList(String key);
 
     /**
      * 清空所有缓存
@@ -55,6 +77,12 @@ public interface BatCache {
      * @param value
      */
     void put(String key, Serializable value);
+
+    /**
+     * @param key
+     * @param value
+     */
+    void put(String key, String value);
 
     /**
      * 删除一个key

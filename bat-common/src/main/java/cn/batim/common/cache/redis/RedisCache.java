@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author wchao
@@ -13,6 +14,34 @@ import java.util.Collection;
  */
 @Slf4j
 public class RedisCache implements BatCache {
+
+    /**
+     * @param key
+     * @param value
+     */
+    @Override
+    public void putList(String key, String value) {
+        JedisTemplate.getInstance().listPushHead(key, value);
+    }
+
+    /**
+     * 删除
+     *
+     * @param key
+     * @param value
+     */
+    @Override
+    public void removeList(String key, String value) {
+        JedisTemplate.getInstance().listRemove(key,1, value);
+    }
+    /**
+     * @param key
+     * @return
+     */
+    @Override
+    public List<String> getList(String key) {
+        return JedisTemplate.getInstance().listGetAll(key, String.class);
+    }
 
     @Override
     public void clear(String likeKey) {
@@ -59,6 +88,18 @@ public class RedisCache implements BatCache {
 
     @Override
     public void put(String key, Serializable value) {
+        if (StringUtils.isBlank(key)) {
+            return;
+        }
+        JedisTemplate.getInstance().set(key, value);
+    }
+
+    /**
+     * @param key
+     * @param value
+     */
+    @Override
+    public void put(String key, String value) {
         if (StringUtils.isBlank(key)) {
             return;
         }

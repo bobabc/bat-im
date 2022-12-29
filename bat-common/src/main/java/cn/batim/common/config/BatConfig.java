@@ -1,132 +1,93 @@
 package cn.batim.common.config;
 
+import cn.batim.common.cache.BatCache;
+import cn.batim.common.cache.local.LocalCache;
+import cn.batim.common.cache.redis.RedisCache;
+import cn.batim.common.config.biz.RedisConfig;
+import cn.batim.common.config.biz.SslConfig;
+import cn.batim.common.config.biz.WsConfig;
+import cn.batim.common.consts.GlobalCode;
+import cn.batim.common.exception.BatException;
+import cn.batim.common.listener.BatMsgListener;
+import cn.batim.common.cluster.BatClusterService;
+import cn.batim.common.service.BatLoginService;
+import cn.batim.common.cluster.redis.BatRedisClusterKit;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.*;
-import java.util.Properties;
-
 /**
+ * 配置文件
+ *
  * @author zlb
  * @version 1.0
- * @date 2022/12/22 18:35
+ * @date 2022/12/27 17:27
  */
 @Slf4j
+@Data
 public class BatConfig {
-    public final static String CONFIG_FILE = "bat.properties";
-    private Properties properties;
+    private static BatConfig batConfig;
+    private RedisConfig redisConfig;
+    private SslConfig sslConfig;
+    private WsConfig wsConfig;
+    private BatCache batCache;
+    private BatClusterService batClusterService;
+    /**
+     * 登录业务
+     */
+    private BatLoginService batLoginService;
+    /**
+     * 事件注册
+     */
+    public BatMsgListener batMsgListener = BatMsgListener.getInstance();
+    /**
+     * 是否Token拦截
+     */
+    private boolean checkToken = true;
+    /**
+     * 是否集群，集群必须开启Redis
+     */
+    private boolean cluster = false;
 
-
-    public Properties getProperties() {
-        return properties;
+    /**
+     * 配置入口
+     */
+    public BatConfig() {
     }
 
-    public String get(String key) {
-        return this.properties.getProperty(key);
-    }
-
-    public String get(String key, String defaultValue) {
-        return this.properties.getProperty(key, defaultValue);
-    }
-
-    public Integer getInt(String key) {
-        return this.getInt(key, (Integer) null);
-    }
-
-    public Integer getInt(String key, Integer defaultValue) {
-        String value = this.properties.getProperty(key);
-        return value != null ? Integer.parseInt(value.trim()) : defaultValue;
-    }
-
-    public Long getLong(String key) {
-        return this.getLong(key, (Long) null);
-    }
-
-    public Long getLong(String key, Long defaultValue) {
-        String value = this.properties.getProperty(key);
-        return value != null ? Long.parseLong(value.trim()) : defaultValue;
-    }
-
-    public Boolean getBoolean(String key) {
-        return this.getBoolean(key, (Boolean) null);
-    }
-
-    public Boolean getBoolean(String key, Boolean defaultValue) {
-        String value = this.properties.getProperty(key);
-        if (value != null) {
-            value = value.trim();
-            if (Boolean.TRUE.toString().equalsIgnoreCase(value)) {
-                return true;
-            } else if (Boolean.FALSE.toString().equalsIgnoreCase(value)) {
-                return false;
-            } else {
-                throw new RuntimeException("The value can not parse to Boolean : " + value);
-            }
+    private void initConfig() {
+        RedisConfig redisConfig = this.getRedisConfig();
+        if (redisConfig == null) {
+            batCache = new LocalCache();
         } else {
-            return defaultValue;
+            batCache = new RedisCache();
         }
-    }
-
-    public boolean containsKey(String key) {
-        return this.properties.containsKey(key);
-    }
-
-
-    public BatConfig(File file, String encoding) {
-        this.properties = null;
-        if (file == null) {
-            throw new IllegalArgumentException("File can not be null.");
-        } else if (!file.isFile()) {
-            throw new IllegalArgumentException("File not found : " + file.getName());
-        } else {
-            FileInputStream inputStream = null;
-
-            try {
-                inputStream = new FileInputStream(file);
-                this.properties = new Properties();
-                this.properties.load(new InputStreamReader(inputStream, encoding));
-            } catch (IOException var12) {
-                throw new RuntimeException("Error loading properties file.", var12);
-            } finally {
-                if (inputStream != null) {
-                    try {
-                        inputStream.close();
-                    } catch (IOException var11) {
-                        log.error(var11.getMessage(), var11);
-                    }
+        if (isCluster()) {
+            if (batClusterService == null) {
+                if (redisConfig == null) {
+                    log.error("集群模式必须配置Redis");
+                    System.exit(0);
                 }
-
+                // 如果为空，则默认使用Redis集群
+                batClusterService = new BatRedisClusterKit();
             }
-
         }
+        log.info("集群模式:{}", isCluster());
+        log.info("缓存文件:{}", batCache.getClass().getName());
+        log.info("配置文件初始化完成！");
     }
 
-    public BatConfig(String fileName, String encoding) {
-        this.properties = null;
-        InputStream inputStream = null;
-        try {
-            inputStream = this.getClassLoader().getResourceAsStream(fileName);
-            if (inputStream == null) {
-                throw new IllegalArgumentException("Properties file not found in classpath: " + fileName);
-            }
-            this.properties = new Properties();
-            this.properties.load(new InputStreamReader(inputStream, encoding));
-        } catch (IOException var12) {
-            throw new RuntimeException("Error loading properties file.", var12);
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException var11) {
-                    log.error(var11.getMessage(), var11);
-                }
-            }
-
+    public static void init(BatConfig config) {
+        if (batConfig == null) {
+            batConfig = config;
         }
-
+        batConfig.initConfig();
     }
 
-    private ClassLoader getClassLoader() {
-        ClassLoader ret = Thread.currentThread().getContextClassLoader();
-        return ret != null ? ret : this.getClass().getClassLoader();
+    public static BatConfig me() {
+        if (batConfig == null) {
+            throw new BatException(GlobalCode.PARAM_3000, "请先初始化配置文件！");
+        }
+        return batConfig;
     }
+
 }
