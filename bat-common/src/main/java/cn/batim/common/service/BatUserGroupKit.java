@@ -1,6 +1,7 @@
 package cn.batim.common.service;
 
 import cn.batim.common.consts.key.BatUserKey;
+import cn.hutool.core.getter.GroupedTypeGetter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
@@ -45,6 +46,21 @@ public class BatUserGroupKit extends BatUserKit {
     }
 
     /**
+     * 是否在群组
+     *
+     * @param userId
+     * @param groupId
+     * @return
+     */
+    public static boolean isExist(String userId, String groupId) {
+        List<String> list = getList(userId);
+        if (CollectionUtils.isEmpty(list)) {
+            return false;
+        }
+        return list.contains(groupId);
+    }
+
+    /**
      * 用户已加入群组列表
      *
      * @param userId
@@ -56,12 +72,12 @@ public class BatUserGroupKit extends BatUserKit {
     }
 
     /**
-     * 获取已加入群组用户列表
+     * 群组内用户列表
      *
      * @param groupId
      * @return
      */
-    public static Set<String> getJoinedUserList(String groupId) {
+    public static Set<String> getGroupUserList(String groupId) {
         Set<String> result = new HashSet<>(50);
         // 如果查询慢，后期可以添加本地缓存
         Collection<String> keys = getCache().keys(":join");
@@ -78,4 +94,25 @@ public class BatUserGroupKit extends BatUserKit {
         }
         return result;
     }
+
+    /**
+     * 所有群组（已加入），成员ID
+     *
+     * @param userId
+     * @return
+     */
+    public static Set<String> getJoinedGroupUserList(String userId) {
+        Set<String> userIdList = new HashSet<>();
+        List<String> groupIdList = BatUserGroupKit.getList(userId);
+        if (CollectionUtils.isNotEmpty(groupIdList)) {
+            for (String groupId : groupIdList) {
+                Set<String> joinedUserList = BatUserGroupKit.getGroupUserList(groupId);
+                if (CollectionUtils.isNotEmpty(joinedUserList)) {
+                    userIdList.addAll(joinedUserList);
+                }
+            }
+        }
+        return userIdList;
+    }
+
 }

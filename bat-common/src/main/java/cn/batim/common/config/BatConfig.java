@@ -3,15 +3,15 @@ package cn.batim.common.config;
 import cn.batim.common.cache.BatCache;
 import cn.batim.common.cache.local.LocalCache;
 import cn.batim.common.cache.redis.RedisCache;
+import cn.batim.common.cluster.BatClusterService;
+import cn.batim.common.cluster.redis.BatRedisClusterServiceImpl;
 import cn.batim.common.config.biz.RedisConfig;
 import cn.batim.common.config.biz.SslConfig;
 import cn.batim.common.config.biz.WsConfig;
 import cn.batim.common.consts.GlobalCode;
 import cn.batim.common.exception.BatException;
 import cn.batim.common.listener.BatMsgListener;
-import cn.batim.common.cluster.BatClusterService;
 import cn.batim.common.service.BatLoginService;
-import cn.batim.common.cluster.redis.BatRedisClusterKit;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,7 +68,7 @@ public class BatConfig {
                     System.exit(0);
                 }
                 // 如果为空，则默认使用Redis集群
-                batClusterService = new BatRedisClusterKit();
+                batClusterService = new BatRedisClusterServiceImpl();
             }
         }
         log.info("集群模式:{}", isCluster());

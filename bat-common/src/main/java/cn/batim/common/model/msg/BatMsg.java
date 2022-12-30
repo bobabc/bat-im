@@ -26,7 +26,8 @@ public class BatMsg {
     private String body;
 
     public BatMsg() {
-
+        this.id = RandomUtil.simpleUUID();
+        time = System.currentTimeMillis();
     }
     public BatMsg(BatConst.Cmd cmd) {
         this.cmd = cmd;

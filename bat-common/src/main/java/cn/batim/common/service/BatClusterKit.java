@@ -20,8 +20,8 @@ public class BatClusterKit {
      * @param batClusterMsg
      */
     public static void send(BatClusterMsg batClusterMsg) {
-        log.info("发送集群消息:{}", batClusterMsg);
         if (BatConfig.me().isCluster()) {
+            log.info("发送集群消息:{}", batClusterMsg);
             BatClusterService batClusterService = BatConfig.me().getBatClusterService();
             if (batClusterService == null) {
                 log.warn("集群消息发送失败：集群未启用！");
@@ -30,4 +30,5 @@ public class BatClusterKit {
             }
         }
     }
+
 }

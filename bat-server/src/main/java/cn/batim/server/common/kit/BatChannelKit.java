@@ -10,12 +10,14 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author zlb
  * @version 1.0
  * @date 2022/12/26 15:50
  */
+@Slf4j
 public class BatChannelKit {
     public static String getId(Channel channel) {
         return channel.id().asShortText();
@@ -60,8 +62,12 @@ public class BatChannelKit {
     }
 
     public static void close(Channel channel) {
-        if (channel != null && channel.isOpen()) {
-            channel.close();
+        try {
+            if (channel != null && channel.isOpen() && channel.isActive()) {
+                channel.close();
+            }
+        } catch (Exception e) {
+            log.info("关闭Channel异常:",e);
         }
     }
 

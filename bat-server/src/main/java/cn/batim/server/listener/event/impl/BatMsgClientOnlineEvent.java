@@ -3,6 +3,7 @@ package cn.batim.server.listener.event.impl;
 import cn.batim.common.consts.BatConst;
 import cn.batim.common.model.msg.BatMsg;
 import cn.batim.common.service.BatUserClientKit;
+import cn.batim.server.common.kit.BatSessionKit;
 import cn.batim.server.common.model.BatSession;
 import cn.batim.server.common.model.msg.BatSessionMsg;
 import cn.batim.server.listener.event.BatEvent;
@@ -25,20 +26,26 @@ public class BatMsgClientOnlineEvent extends BatEvent implements BatConst {
      */
     @Override
     protected void act(BatSession session, BatMsg msg) {
+        log.info("终端上线:{}",msg);
         if (msg instanceof BatSessionMsg) {
             BatSessionMsg batSessionMsg = (BatSessionMsg) msg;
+            // 保存通道
             BatSession batSession = batSessionMsg.getBatSession();
-
             // 用户是否在线
             boolean onLine = BatUserClientKit.isOnLine(batSession.getUserId());
+            log.info("用户在线状态：{}",onLine);
             // 终端是否在线
             boolean clientOnLine = BatUserClientKit.isOnLine(batSession.getUserId(), batSession.getClient());
             if (clientOnLine) {
                 // 断开其他终端
                 BatSessionMsg offClientSessionMsg = BatSessionMsg.getInstance(batSession.getClient(), Cmd.CLIENT_OFFLINE);
-                offClientSessionMsg.setMe(batSession.getUserId());
+                offClientSessionMsg
+                        .setBatSession(batSession)
+                        .setMe(batSession.getUserId());
                 BatEventParser.parse(session, offClientSessionMsg);
             }
+            // 保存
+            BatSessionKit.save(batSession);
             // 存储终端
             BatUserClientKit.save(batSession.getUserId(), batSession.getClient());
             if (!onLine) {

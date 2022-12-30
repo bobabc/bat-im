@@ -24,10 +24,14 @@ public class CloseWebSocketHandler extends SimpleChannelInboundHandler<CloseWebS
     protected void channelRead0(ChannelHandlerContext ctx, CloseWebSocketFrame frame) {
         Channel channel = ctx.channel();
         BatSession session = BatSessionKit.getByChannelId(channel);
+        log.info("CloseWebSocketHandler:{},session:{}",channel.id().asShortText(),session);
         if (session != null) {
             // 处理连接消息
-            BatSessionMsg batSessionMsg = BatSessionMsg.getInstance(session.getClient(), BatConst.Cmd.CLIENT_DISCONNECT);
-            batSessionMsg.setBatSession(session).setMe(session.getUserId());
+            BatSessionMsg batSessionMsg = BatSessionMsg.getInstance(session.getClient(), BatConst.Cmd.CLIENT_OFFLINE);
+            batSessionMsg
+                    .setBatSession(session)
+                    .setClient(session.getClient())
+                    .setMe(session.getUserId());
             BatEventParser.parse(session, batSessionMsg);
         }
     }

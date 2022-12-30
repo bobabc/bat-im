@@ -2,10 +2,19 @@ package cn.batim.server.listener.event.impl;
 
 import cn.batim.common.model.msg.BatMsg;
 import cn.batim.common.model.msg.impl.BatClusterMsg;
+import cn.batim.common.model.reponse.R;
 import cn.batim.common.service.BatClusterKit;
+import cn.batim.common.service.BatUserGroupKit;
+import cn.batim.server.common.kit.BatChannelKit;
+import cn.batim.server.common.kit.BatKit;
+import cn.batim.server.common.kit.BatSessionKit;
 import cn.batim.server.common.model.BatSession;
 import cn.batim.server.listener.event.BatEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * 用户登录
@@ -20,8 +29,11 @@ public class BatMsgUserLoginEvent extends BatEvent {
     protected void act(BatSession session, BatMsg msg) {
         log.info("用户上线：{}", msg);
         String userId = msg.getMe();
-        // 推送好友&已加入群组消息
-
+        // 推送全部群组
+        R<String> ret = BatKit.sendJoinedGroup(msg);
+        if (!ret.success()) {
+            log.error("推送失败:{}", ret.getMsg());
+        }
         // 集群通知
         if (!(msg instanceof BatClusterMsg)) {
             BatClusterMsg batClusterMsg = BatClusterMsg.getInstance(msg.getCmd());

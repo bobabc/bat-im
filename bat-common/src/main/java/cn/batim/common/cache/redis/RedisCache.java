@@ -40,7 +40,7 @@ public class RedisCache implements BatCache {
      */
     @Override
     public List<String> getList(String key) {
-        return JedisTemplate.getInstance().listGetAll(key, String.class);
+        return JedisTemplate.getInstance().listGetAll(key);
     }
 
     @Override

@@ -55,4 +55,5 @@ public class TextWebSocketHandler extends SimpleChannelInboundHandler<TextWebSoc
             BatChannelKit.pub(channel, "消息体格式错误！");
         }
     }
+
 }

@@ -7,7 +7,6 @@ import cn.batim.common.service.BatUserGroupKit;
 import cn.batim.server.common.kit.BatChannelKit;
 import cn.batim.server.common.model.BatSession;
 import cn.batim.server.listener.event.BatEvent;
-import com.sun.org.apache.xpath.internal.operations.Gt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -32,7 +31,7 @@ public class BatMsgGroupRemoveEvent extends BatEvent {
             BatChannelKit.pub(session, "删除失败：无权限");
             return;
         }
-        Set<String> joinedUserList = BatUserGroupKit.getJoinedUserList(groupId);
+        Set<String> joinedUserList = BatUserGroupKit.getGroupUserList(groupId);
         if (CollectionUtils.isNotEmpty(joinedUserList)){
             // 群组内有成员不能删除
             BatChannelKit.pub(session, "删除失败：成员非空");

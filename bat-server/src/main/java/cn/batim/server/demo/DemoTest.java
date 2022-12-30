@@ -1,8 +1,5 @@
 package cn.batim.server.demo;
 
-import cn.batim.common.config.BatConfig;
-import cn.batim.common.consts.BatConst;
-import cn.batim.common.model.msg.BatMsg;
 import lombok.extern.slf4j.Slf4j;
 
 /**

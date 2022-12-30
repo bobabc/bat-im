@@ -1,7 +1,6 @@
 package cn.batim.common.service;
 
 import cn.batim.common.cache.BatCache;
-import cn.batim.common.cache.local.LocalCache;
 import cn.batim.common.config.BatConfig;
 import cn.batim.common.consts.BatConst;
 import cn.batim.common.consts.key.BatUserKey;

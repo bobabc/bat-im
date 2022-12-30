@@ -3,6 +3,7 @@ package cn.batim.server.listener.event;
 import cn.batim.common.config.BatConfig;
 import cn.batim.common.consts.BatConst;
 import cn.batim.common.model.msg.BatMsg;
+import cn.batim.common.model.msg.impl.BatClusterMsg;
 import cn.batim.server.common.model.BatSession;
 import cn.batim.server.listener.event.impl.*;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +28,6 @@ public class BatEventParser {
         CMD_MAP.put(BatConst.Cmd.OTO, new BatMsgOtoEvent());
         CMD_MAP.put(BatConst.Cmd.OTG, new BatMsgOtgEvent());
         CMD_MAP.put(BatConst.Cmd.PUB, new BatMsgPubEvent());
-        // 服务触发命令
-        CMD_MAP.put(BatConst.Cmd.CLIENT_CONNECTED, new BatMsgClientConnectedEvent());
-        CMD_MAP.put(BatConst.Cmd.CLIENT_DISCONNECT, new BatMsgClientDisconnectEvent());
 
         CMD_MAP.put(BatConst.Cmd.CLIENT_ONLINE, new BatMsgClientOnlineEvent());
         CMD_MAP.put(BatConst.Cmd.CLIENT_OFFLINE, new BatMsgClientOfflineEvent());
@@ -54,8 +52,10 @@ public class BatEventParser {
         BatEvent batEvent = CMD_MAP.get(msg.getCmd());
         if (batEvent != null) {
             batEvent.act(session, msg);
-            // 注册事件消息推送
-            BatConfig.me().batMsgListener.push(msg);
+            if (!(msg instanceof BatClusterMsg)){
+                // 注册事件消息推送
+                BatConfig.me().batMsgListener.push(msg);
+            }
         } else {
             log.warn("未知消息事件:{}", msg.getCmd());
         }

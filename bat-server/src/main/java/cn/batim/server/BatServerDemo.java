@@ -3,11 +3,15 @@ package cn.batim.server;
 import cn.batim.common.config.BatConfig;
 import cn.batim.common.consts.BatConst;
 import cn.batim.common.model.user.BatChannelUser;
+import cn.batim.server.common.kit.BatSessionKit;
+import cn.batim.server.common.model.BatSession;
 import cn.batim.server.demo.DemoMsgListener;
 import cn.batim.server.demo.MyRedisConfig;
 import cn.batim.server.demo.MyWsConfig;
 import io.netty.channel.ChannelFuture;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 /**
  * @author zlb
@@ -24,8 +28,9 @@ public class BatServerDemo {
         // 开启Token拦截，默认开启
         batConfig.setCheckToken(true);
 
+        batConfig.setCluster(true);
         // Redis配置
-//        batConfig.setRedisConfig(new MyRedisConfig());
+        batConfig.setRedisConfig(new MyRedisConfig());
         // WebSocket配置
         batConfig.setWsConfig(new MyWsConfig());
 

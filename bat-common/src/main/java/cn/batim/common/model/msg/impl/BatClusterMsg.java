@@ -16,7 +16,10 @@ public class BatClusterMsg extends BatMsg {
      */
     private String nodeId;
 
-    private BatClusterMsg(BatConst.Cmd cmd) {
+    public BatClusterMsg() {
+    }
+
+    public BatClusterMsg(BatConst.Cmd cmd) {
         super(cmd);
         setNodeId(BatConst.BAT_ID);
     }

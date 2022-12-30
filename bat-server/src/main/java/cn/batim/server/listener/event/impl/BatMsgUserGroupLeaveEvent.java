@@ -2,15 +2,18 @@ package cn.batim.server.listener.event.impl;
 
 import cn.batim.common.model.msg.BatMsg;
 import cn.batim.common.model.msg.impl.BatClusterMsg;
+import cn.batim.common.model.reponse.R;
 import cn.batim.common.service.BatClusterKit;
 import cn.batim.common.service.BatUserGroupKit;
+import cn.batim.server.common.kit.BatChannelKit;
+import cn.batim.server.common.kit.BatKit;
 import cn.batim.server.common.model.BatSession;
 import cn.batim.server.listener.event.BatEvent;
 import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- *   离开群组
+ * 离开群组
  *
  * @author zlb
  * @version 1.0
@@ -21,14 +24,10 @@ public class BatMsgUserGroupLeaveEvent extends BatEvent {
     @Override
     protected void act(BatSession session, BatMsg msg) {
         log.info("离开群组：{}", msg);
-        String groupId = msg.getTo();
-        BatUserGroupKit.leave(msg.getMe(), groupId);
-
-        // 集群通知
-        if (!(msg instanceof BatClusterMsg)){
-            BatClusterMsg batClusterMsg = BatClusterMsg.getInstance(msg.getCmd());
-            BeanUtil.copyProperties(msg, batClusterMsg);
-            BatClusterKit.send(batClusterMsg);
+        R<String> ret = BatKit.leaveGroup(msg);
+        if (!ret.success()){
+            log.info("失败:{}",ret.getMsg());
+            BatChannelKit.pub(session, ret.getMsg());
         }
     }
 }

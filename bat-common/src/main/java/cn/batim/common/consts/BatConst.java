@@ -12,12 +12,28 @@ public interface BatConst {
      * 本机唯一ID
      */
     String BAT_ID = RandomUtil.simpleUUID().toUpperCase();
-    interface Number{
+
+    /**
+     * 集群频道
+     */
+    enum ClusterChannel {
+        /**
+         * 公共频道
+         */
+        PUBLIC_MSG,
+        /**
+         * 专线
+         */
+        SERVER_MSG_ME
+    }
+
+    interface Number {
         Integer ONE = 1;
         Integer TWO = 2;
         Integer THREE = 3;
         Integer FOUR = 4;
     }
+
     /**
      * 请求路径
      */
@@ -107,14 +123,6 @@ public interface BatConst {
          * 用户退出操作
          */
         USER_LOGIN_OUT,
-        /**
-         * 客户端连接
-         */
-        CLIENT_CONNECTED,
-        /**
-         * 客户端断开
-         */
-        CLIENT_DISCONNECT,
         /**
          * 终端上线
          */

@@ -5,12 +5,14 @@ import cn.batim.server.common.kit.BatChannelKit;
 import io.netty.channel.Channel;
 import lombok.Data;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * @author zlb
  * @version 1.0
  * @date 2022/12/26 16:02
  */
+@ToString
 @Getter
 public class BatSession {
     private String userId;

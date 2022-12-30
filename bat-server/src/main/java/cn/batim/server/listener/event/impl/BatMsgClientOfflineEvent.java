@@ -30,12 +30,23 @@ public class BatMsgClientOfflineEvent extends BatEvent implements BatConst {
     protected void act(BatSession session, BatMsg msg) {
         if (msg instanceof BatSessionMsg) {
             BatSessionMsg batSessionMsg = (BatSessionMsg) msg;
+            log.info("终端下线:{}",batSessionMsg);
+            // 现在的终端Session
+            BatSession batSession = batSessionMsg.getBatSession();
             BatConst.Client client = batSessionMsg.getClient();
             String userId = batSessionMsg.getMe();
+            // 删除Session
+            BatSessionKit.remove(batSession);
+            // 删除终端
+            BatUserClientKit.remove(userId, client);
+            // 断开Session
             List<BatSession> sessions = BatSessionKit.list(userId, client);
-            for (BatSession batSession : sessions) {
-                BatSessionKit.remove(batSession);
-                BatSessionKit.close(batSession);
+            for (BatSession bSession : sessions) {
+                // 不能删除当前Session
+                if (!bSession.getId().equals(batSession.getId())){
+                    BatSessionKit.remove(bSession);
+                    BatSessionKit.close(bSession);
+                }
             }
             // 用户是否在线
             boolean onLine = BatUserClientKit.isOnLine(userId);

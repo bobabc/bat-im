@@ -108,7 +108,6 @@ public class BatSessionKit {
                     break;
                 }
             }
-            SESSION_MAP.put(userId, list);
         }
     }
 

@@ -7,7 +7,6 @@ import cn.batim.common.service.BatLoginService;
 import cn.batim.server.common.BatServerConsts;
 import cn.batim.server.common.kit.BatChannelKit;
 import cn.batim.server.common.kit.BatHttpUtil;
-import cn.batim.server.common.kit.BatSessionKit;
 import cn.batim.server.common.model.BatSession;
 import cn.batim.server.common.model.msg.BatSessionMsg;
 import cn.batim.server.listener.event.BatEventParser;
@@ -31,11 +30,10 @@ import java.util.Map;
 public class FilterHandler extends ChannelInboundHandlerAdapter {
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
         Channel channel = ctx.channel();
         if (msg instanceof FullHttpRequest) {
             // 开始握手校验
-            log.info("channelRead:{}", msg);
             FullHttpRequest request = (FullHttpRequest) msg;
             log.info("uri:{}", request.uri());
             if (BatHttpUtil.isWebSocket(request)) {
@@ -58,10 +56,11 @@ public class FilterHandler extends ChannelInboundHandlerAdapter {
                 }
                 channel.attr(BatServerConsts.BAT_SESSION).setIfAbsent(user);
                 // 处理连接消息
-                BatSessionMsg batSessionMsg = BatSessionMsg.getInstance(client, BatConst.Cmd.CLIENT_CONNECTED);
+                BatSessionMsg batSessionMsg = BatSessionMsg.getInstance(client, BatConst.Cmd.CLIENT_ONLINE);
                 BatSession batSession = new BatSession(user.getUserId(), channel);
+                batSession.setClient(client);
                 batSessionMsg
-                        .setBatSession(new BatSession(user.getUserId(), channel))
+                        .setBatSession(batSession)
                         .setClient(client)
                         .setMe(user.getUserId());
                 BatEventParser.parse(batSession, batSessionMsg);
@@ -78,7 +77,7 @@ public class FilterHandler extends ChannelInboundHandlerAdapter {
                 }
             }
         }
-        super.channelRead(ctx, msg);
+        ctx.fireChannelRead(msg);
     }
 
     /**
@@ -100,5 +99,11 @@ public class FilterHandler extends ChannelInboundHandlerAdapter {
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         log.info("channelReadComplete:{}", ctx.channel().id());
         super.channelReadComplete(ctx);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.info("exceptionCaught::",cause);
+        BatChannelKit.close(ctx.channel());
     }
 }

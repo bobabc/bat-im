@@ -13,10 +13,14 @@ import lombok.Getter;
 public class BatHttpProxyMsg extends BatMsg {
     private String token;
 
-    protected BatHttpProxyMsg(BatConst.Cmd cmd) {
+    public BatHttpProxyMsg() {
+    }
+
+    public BatHttpProxyMsg(BatConst.Cmd cmd) {
         super(cmd);
     }
-    public static BatHttpProxyMsg getInstance(BatConst.Cmd cmd){
+
+    public static BatHttpProxyMsg getInstance(BatConst.Cmd cmd) {
         return new BatHttpProxyMsg(cmd);
     }
 
