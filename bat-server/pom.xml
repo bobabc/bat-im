@@ -9,6 +9,25 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>bat-server</artifactId>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:https://github.com/bobabc/bat-im.git</connection>
+        <developerConnection>scm:git:https://github.com/bobabc/bat-im.git</developerConnection>
+        <url>git:https://github.com/bobabc/bat-im.git</url>
+    </scm>
+    <developers>
+        <developer>
+            <name>bob</name>
+            <email>bob_abc@126.com</email>
+            <url>http://batim.cn</url>
+            <organization>i1stcs</organization>
+        </developer>
+    </developers>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -89,68 +108,17 @@
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
     </dependencies>
-
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.properties</include>
-                    <include>**/*.xml</include>
-                    <include>**/page/*.*</include>
-                    <include>**/*.yml</include>
-                </includes>
-                <filtering>false</filtering>
-            </resource>
-
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring.boot.maven}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                            <goal>build-info</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.20.1</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${spring.boot.maven}</version>
                 <configuration>
-                    <skip>true</skip>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <configuration>
-                    <threshold>High</threshold>
-                    <effort>Default</effort>
-                    <findbugsXmlOutput>true</findbugsXmlOutput>
-                    <!--					findbugs xml输出路径-->
-                    <findbugsXmlOutputDirectory>target/site</findbugsXmlOutputDirectory>
-                </configuration>
-
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-
             </plugin>
         </plugins>
     </build>
