@@ -3,18 +3,28 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>cn.batim</groupId>
     <artifactId>bat-im</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <description>长链接服务</description>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:https://github.com/bobabc/bat-im.git</connection>
+        <developerConnection>scm:git:https://github.com/bobabc/bat-im.git</developerConnection>
+        <url>git:https://github.com/bobabc/bat-im.git</url>
+    </scm>
     <developers>
         <developer>
-            <id>bob</id>
             <name>bob</name>
             <email>bob_abc@126.com</email>
             <url>http://batim.cn</url>
+            <organization>i1stcs</organization>
         </developer>
     </developers>
     <modules>
